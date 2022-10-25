@@ -7,4 +7,4 @@ COPY . /app
 
 EXPOSE 5000
 
-CMD ["gunicorn", "--log-file=-", "--bind=0.0.0.0:5000", "server:app"]
+CMD ["gunicorn", "--log-file=-", "--bind=0.0.0.0:5000", "wsgi:run_proxy()"]

@@ -4,26 +4,53 @@ services:
   gunicorn:
     build:
       context: ./server
-    command: gunicorn --log-level=DEBUG --log-file=- --bind 0.0.0.0:5000 'server:app'
+    command: gunicorn --log-level=DEBUG --log-file=- --bind 0.0.0.0:5000 'wsgi:run_proxy()'
     environment:
       - FLASK_ENV=production
       - LOG_LEVEL=DEBUG
       - SCRIPT_NAME=/api
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
     expose:
       - 5000
     networks:
       - backend
 
-  frontend:
-    build:
-      context: ./frontend
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #   ports:
+  #     - "8000:80/tcp"
+  #   depends_on:
+  #     - gunicorn
+  #   networks:
+  #     - backend
+  #     - default
+  traefik:
+    image: "traefik:v2.9"
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=true"
+      # - "--entryPoints.web.proxyProtocol.insecure=false"
     ports:
-      - "8000:80/tcp"
+      - "8002:80"
+      - "8082:8080"
     depends_on:
       - gunicorn
     networks:
       - backend
       - default
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  
+
 
 networks:
   backend:

@@ -18,36 +18,36 @@ services:
     networks:
       - backend
 
-  # frontend:
-  #   build:
-  #     context: ./frontend
-  #   ports:
-  #     - "8000:80/tcp"
-  #   depends_on:
-  #     - gunicorn
-  #   networks:
-  #     - backend
-  #     - default
-  traefik:
-    image: "traefik:v2.9"
-    container_name: "traefik"
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-      - "--api.dashboard=true"
-      # - "--entryPoints.web.proxyProtocol.insecure=false"
+  frontend:
+    build:
+      context: ./frontend
     ports:
-      - "8002:80"
-      - "8082:8080"
+      - "8000:80/tcp"
     depends_on:
       - gunicorn
     networks:
       - backend
       - default
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  # traefik:
+  #   image: "traefik:v2.9"
+  #   container_name: "traefik"
+  #   command:
+  #     - "--api.insecure=true"
+  #     - "--providers.docker=true"
+  #     - "--providers.docker.exposedbydefault=false"
+  #     - "--entrypoints.web.address=:80"
+  #     - "--api.dashboard=true"
+  #     # - "--entryPoints.web.proxyProtocol.insecure=false"
+  #   ports:
+  #     - "8002:80"
+  #     - "8082:8080"
+  #   depends_on:
+  #     - gunicorn
+  #   networks:
+  #     - backend
+  #     - default
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   
 
